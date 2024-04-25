@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./element-plus.css" />
+    <title>初始页</title>
+</head>
+<body>
+<div id="app">
+    <el-form :mode="form" ref="form">
+        <el-form-item label="选择脚本">
+            <el-select v-model="form.script">
+                <el-option v-for="item in scripts" :label="item.name" :value="item.url" :key="item.url"></el-option>
+            </el-select>
+        </el-form-item>
+    </el-form>
+    <el-button type="primary" @click="submit">前往</el-button>
+</div>
+
+<script src="./vue.global.js"></script>
+<script src="./element-plus.js"></script>
+<script type="text/javascript">
+
+
+    console.log(window.tools,"<<<");
+    const {createApp} = Vue;
+    const app = createApp({
+        data(){
+            return {
+                scripts:window.tools.scripts,
+                form:{
+                    script:"http://172.17.10.202/educationadmin/fe"
+                }
+            }
+        },
+        methods:{
+            submit(){
+                location.href = this.form.script;
+            }
+        },
+        mounted() {
+            this.submit();
+        }
+    });
+    app.use(ElementPlus);
+    app.mount("#app")
+</script>
+</body>
+</html>
