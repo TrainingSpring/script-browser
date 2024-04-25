@@ -1,0 +1,16 @@
+{
+  "hhGitLab": {
+    "name": "鸿鹄gitLab",
+    "url": "http://172.17.10.202",
+    "username": "1341881562@qq.com",
+    "password": "1341881562wang",
+    "urls":["*://172.17.10.202*"],
+    "script":"hh-gitlab.js"
+  },
+  "sww": {
+    "name":"双卫网",
+    "url":"http://sww.com.cn",
+    "urls":["http://sww.com.cn"],
+    "script":"sww.js"
+  }
+}

@@ -3,6 +3,7 @@ const path = require("path");
 const Vue = require("vue");
 const fs = require("fs");
 const tools = require("./tools.js");
+const config = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json"), "utf-8"));
 // import "../../pages/element-plus.css"
 function login(){
     let id = document.getElementById("user_login");
@@ -61,7 +62,7 @@ function setToolsBar(){
     
     `
     const axios = $axios.create({
-        baseURL:"http://172.17.10.202", // 仓库地址
+        baseURL:config.hhGitLab.url, // 仓库地址
         maxRedirects:0
     })
     document.body.append(toolsBar); // 插入工具到页面

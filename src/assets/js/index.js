@@ -1,25 +1,19 @@
 let {ipcRenderer} = require('electron');
-const {inject} = require("../../pages/vue.global");
+let fs = require('fs');
+let path = require('path');
+let config = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json"), "utf-8"));
+
+let scripts = [];
+for (let i in config){
+    let item = config[i];
+    item.id = i;
+    scripts.push(item);
+}
 window.tools = {
     send: function (name, data) {
         ipcRenderer.send(name, data);
     },
-    scripts:[
-        {
-            id:0,
-            name:"双卫网",
-            url:"http://sww.com.cn",
-            urls:["http://sww.com.cn"],
-            script:"sww.js"
-        },
-        {
-            id:1,
-            name:"鸿鹄GitLab",
-            url:"http://172.17.10.202/educationadmin/fe",
-            urls:["*://172.17.10.202*"],
-            script:"hh-gitlab.js"
-        }
-    ],
+    scripts,
     // 通配符转正则
     bracketToRegExp(str){
         str = str.replaceAll(".","\\.").replaceAll("*",".*").replaceAll("?","\\?");
@@ -27,9 +21,6 @@ window.tools = {
     },
     getScript(url){
         return this.scripts.find(item=>item.url===url);
-    },
-    getScriptId(url){
-        return this.getScript(url)?.id;
     },
     injectScript(url){
         let item;

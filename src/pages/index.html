@@ -20,16 +20,13 @@
 <script src="./vue.global.js"></script>
 <script src="./element-plus.js"></script>
 <script type="text/javascript">
-
-
-    console.log(window.tools,"<<<");
     const {createApp} = Vue;
     const app = createApp({
         data(){
             return {
                 scripts:window.tools.scripts,
                 form:{
-                    script:"http://172.17.10.202/educationadmin/fe"
+                    script:"http://172.17.10.202"
                 }
             }
         },

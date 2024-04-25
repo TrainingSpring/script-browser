@@ -7,7 +7,7 @@
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
-    "build": "electron-packager . 双卫网 --platform=win32 --arch=x64  --out=./out --asar --app-version=1.0.0 --overwrite --ignore=node_modules"
+    "build": "electron-packager . gitLab-Script --platform=win32 --arch=x64  --out=./out --asar --app-version=1.0.0 --overwrite --ignore=node_modules"
   },
   "author": "training",
   "license": "ISC",
