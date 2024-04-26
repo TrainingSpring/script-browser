@@ -1,17 +1,18 @@
-const $axios = require("axios");
+const $axios = require("../modules/axios/dist/browser/axios.cjs");
 const path = require("path");
-const Vue = require("vue");
 const fs = require("fs");
 const tools = require("./tools.js");
-const config = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json"), "utf-8"));
+const {setScript,setStyle,getConfig} = require("./utils")
+const config = getConfig();
 // import "../../pages/element-plus.css"
 function login(){
+    let cfg = config.hhGitLab;
     let id = document.getElementById("user_login");
     let pwd = document.getElementById("user_password");
     let remember = document.getElementById("user_remember_me");
     let button = document.querySelector(".submit-container .btn-confirm");
-    id.value = "1341881562@qq.com";
-    pwd.value = "1341881562wang";
+    id.value = cfg.username;
+    pwd.value = cfg.password;
     remember.checked = true;
     button.click();
 }
@@ -223,7 +224,7 @@ function setToolsBar(){
             },
         }
     });
-    app.use(require("../../pages/element-plus"));
+    app.use(ElementPlus);
     app.mount("#tools-bar");
 
 }
@@ -234,6 +235,8 @@ function handle(ev){
             login();
             break;
         default:
+            setScript(fs.readFileSync(path.join(__dirname, "../../pages/vue.global.js"), "utf-8"));
+            setScript(fs.readFileSync(path.join(__dirname, "../../pages/element-plus.js"), "utf-8"));
             setToolsBar();
             setToolsBarStyle();
             break;
@@ -299,10 +302,4 @@ function setToolsBarStyle(){
     border-bottom:none;
 }
 `)
-}
-function setStyle(css){
-
-    let style = document.createElement('style')
-    style.innerText = css;
-    document.head.append(style);
 }

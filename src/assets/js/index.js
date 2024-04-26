@@ -1,7 +1,8 @@
 let {ipcRenderer} = require('electron');
 let fs = require('fs');
 let path = require('path');
-let config = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json"), "utf-8"));
+let {getConfig} = require("./utils.js");
+let config = getConfig();
 
 let scripts = [];
 for (let i in config){

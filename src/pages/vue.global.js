@@ -692,7 +692,7 @@ var Vue = (function (exports) {
           target,
           type,
           key
-        } 
+        }
       );
     }
   }
@@ -754,7 +754,7 @@ var Vue = (function (exports) {
             newValue,
             oldValue,
             oldTarget
-          } 
+          }
         );
       }
     }
@@ -1416,7 +1416,7 @@ getter: `, this.getter);
           target: ref2,
           type: "get",
           key: "value"
-        } 
+        }
       );
     }
   }
@@ -1432,7 +1432,7 @@ getter: `, this.getter);
           type: "set",
           key: "value",
           newValue: newVal
-        } 
+        }
       );
     }
   }
@@ -3366,14 +3366,14 @@ If this is a native custom element, make sure to exclude it from component resol
     return doWatch(
       effect,
       null,
-      extend({}, options, { flush: "post" }) 
+      extend({}, options, { flush: "post" })
     );
   }
   function watchSyncEffect(effect, options) {
     return doWatch(
       effect,
       null,
-      extend({}, options, { flush: "sync" }) 
+      extend({}, options, { flush: "sync" })
     );
   }
   const INITIAL_WATCHER_VALUE = {};
@@ -4580,7 +4580,7 @@ If this is a native custom element, make sure to exclude it from component resol
         queueJob(i.update);
       }),
       $nextTick: (i) => i.n || (i.n = nextTick.bind(i.proxy)),
-      $watch: (i) => instanceWatch.bind(i) 
+      $watch: (i) => instanceWatch.bind(i)
     })
   );
   const isReservedPrefix = (key) => key === "_" || key === "$";
@@ -11209,7 +11209,7 @@ Make sure to use the production build (*.prod.js) when deploying for production.
   const CREATE_STATIC = Symbol(`createStaticVNode` );
   const RESOLVE_COMPONENT = Symbol(`resolveComponent` );
   const RESOLVE_DYNAMIC_COMPONENT = Symbol(
-    `resolveDynamicComponent` 
+    `resolveDynamicComponent`
   );
   const RESOLVE_DIRECTIVE = Symbol(`resolveDirective` );
   const RESOLVE_FILTER = Symbol(`resolveFilter` );
@@ -16154,7 +16154,7 @@ Use a v-bind binding combined with a v-on listener that emits update:x event ins
     return createCompilerError(
       code,
       loc,
-      DOMErrorMessages 
+      DOMErrorMessages
     );
   }
   const DOMErrorMessages = {
@@ -16468,7 +16468,7 @@ Use a v-bind binding combined with a v-on listener that emits update:x event ins
 
   const DOMNodeTransforms = [
     transformStyle,
-    ...[transformTransition] 
+    ...[transformTransition]
   ];
   const DOMDirectiveTransforms = {
     cloak: noopDirectiveTransform,
@@ -16497,7 +16497,7 @@ Use a v-bind binding combined with a v-on listener that emits update:x event ins
           DOMDirectiveTransforms,
           options.directiveTransforms || {}
         ),
-        transformHoist: null 
+        transformHoist: null
       })
     );
   }
@@ -16540,7 +16540,7 @@ Use a v-bind binding combined with a v-on listener that emits update:x event ins
       {
         hoistStatic: true,
         onError: onError ,
-        onWarn: (e) => onError(e, true) 
+        onWarn: (e) => onError(e, true)
       },
       options
     );
@@ -16727,3 +16727,4 @@ ${codeFrame}` : message);
   return exports;
 
 })({});
+window.Vue = Vue;

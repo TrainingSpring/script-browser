@@ -17,7 +17,7 @@ function createWindow(){
     win.loadFile(path.join(__dirname,"src/pages/index.html"))
     let context = win.webContents;
     // 打开调试器
-    // context.openDevTools();
+    context.openDevTools();
     // 当浏览器加载停止
     context.on("did-finish-load",function () {
         this.send('loaded','did-finish-load')
@@ -32,5 +32,5 @@ app.on('window-all-closed', () => {
     }
 })
 ipcMain.on('inject-script',()=>{
-    win.webPreferences
+
 })
