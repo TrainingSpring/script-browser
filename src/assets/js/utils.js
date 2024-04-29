@@ -26,7 +26,6 @@ function setScript(js){
 function getConfig(){
     let dir = path.join(__dirname, '../../../../config.json');
     let configStr = null;
-    console.log(dir,",,,,,,,,,,,,,,,,,,,,,")
     if (fs.existsSync(dir)){
         configStr = fs.readFileSync(dir,'utf-8');
     }else{

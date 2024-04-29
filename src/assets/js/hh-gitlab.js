@@ -23,7 +23,7 @@ function setToolsBar(){
     toolsBar.id="tools-bar";
     // 仓库, 分支,功能按钮组
     toolsBar.innerHTML = `
-    <div class="tools-bar-top" @click="visibleToolsBar">
+    <div class="tools-bar-top" @click="visibleToolsBar(!visible)">
     <span v-show="visible">隐藏</span>
     <span v-show="!visible">展开</span>
     </div>
@@ -72,10 +72,11 @@ function setToolsBar(){
     // vue
     let app = Vue.createApp({
         data(){
+            let defaultData = tools.getStorage("tools-bar") || {};
             return {
                 lab:null,
                 branch:null,
-                visible:true,
+                visible:defaultData.visible,
                 list:{
                     lab:[],
                     branch:[]
@@ -84,6 +85,8 @@ function setToolsBar(){
         },
         mounted() {
             this.getData();
+            this.visibleToolsBar(this.visible);
+            this.refreshMergePage();
         },
         methods:{
             // 通过id获取项目信息
@@ -99,22 +102,28 @@ function setToolsBar(){
             },
             // 初始化数据获取
             getData(){
-                axios.get("groups/educationadmin/fe/-/children.json").then(res=>{
-                    this.list.lab = res.data;
-                    this.getBranch();
-                })
                 let cache = tools.getStorage("tools-bar");
                 if (cache) {
                     this.lab = cache.lab;
                     this.branch = cache.branch;
                 }
+                axios.get("groups/educationadmin/fe/-/children.json").then(res=>{
+                    this.list.lab = res.data;
+                    this.getBranch("",true);
+                })
             },
             // 获取分支
-            getBranch(str =""){
+            getBranch(str ="",init=false){
                 if (this.lab == null)return;
                 let item = this.getItemById(this.list.lab,this.lab);
                 axios.get(item.relative_path+"/refs?sort=updated_desc&ref=master&search="+str).then(res=>{
                     this.list.branch = res.data.Branches;
+                    if (init){
+                        if(!res.data.Branches.find(item=>item===this.branch)){
+                            this.branch = null;
+                            this.changeBranch(null);
+                        }
+                    }
                 })
             },
             // 分支改变
@@ -138,9 +147,12 @@ function setToolsBar(){
                 this.getBranch(e);
             },
             // 展开/隐藏工具
-            visibleToolsBar(){
-                this.visible = !this.visible;
-                let bar = document.querySelector("#tools-bar")
+            visibleToolsBar(visible){
+                this.visible = visible;
+                let bar = document.querySelector("#tools-bar");
+                this.setCache({
+                    visible:visible
+                })
                 bar.className = !this.visible?"tools-bar-hide":""
             },
             // 检查合并是否已经存在
@@ -166,6 +178,13 @@ function setToolsBar(){
             },
             // 合并
             merge(target_branch){
+                if (this.lab == null){
+                    this.$message.error("请选择仓库！");
+                    return;
+                }else if (this.branch == null) {
+                    this.$message.error("请选择分支！");
+                    return;
+                }
                 let item = this.getItemById(this.list.lab,this.lab);
                 this.checkMerge(target_branch).then(res=>{
                     if (res) {
@@ -212,16 +231,42 @@ function setToolsBar(){
                         axios.post(item.relative_path+"/-/merge_requests",data,{
                             maxRedirects:0
                         }).then(res=>{
+                            location.href = res.request.responseURL;
                             this.$message.success("合并请求已发起！");
                         }).catch(err=>{
-                            console.error("[error] 发起合并请求出错!")
+                            this.$message.error("[error] 发起合并请求出错!")
                         })
                     }).catch(err=>{
-                        console.error("[error] 获取合并请求页面出错!")
+                        this.$message.error("[error] 获取合并请求页面出错!")
                     })
                 })
 
             },
+            // 刷新并合并页
+            refreshMergePage(){
+                if (/\/educationadmin\/fe\/school-system\/\-\/merge_requests\/\d{2,}$/.test(location.pathname)){
+                    setTimeout(()=>{
+                        let db = document.querySelector(".mr-widget-body button[data-testid=\"disabled-merge-button\"]");
+                        let ct = document.querySelector(".mr-widget-body .media-body span.bold").innerText.trim().includes("冲突");
+                        let ci = document.querySelector(".mr-widget-body .gl-display-flex svg[aria-label=\"status_success\"]");
+                        if (db) {
+                            if (ct){
+                                this.$alert("存在冲突，请手动解决冲突后，再合并！","冲突",{
+                                    type:"error",
+                                })
+                            } else if(ci){
+                                this.$message.error({
+                                    message:"无合并权限！",
+                                    duration:3000
+                                });
+                            }else
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 3000);
+                        }
+                    },1000)
+                }
+            }
         }
     });
     app.use(ElementPlus);
@@ -229,7 +274,6 @@ function setToolsBar(){
 
 }
 function handle(ev){
-
     switch (location.pathname){
         case "/users/sign_in":
             login();
@@ -239,11 +283,13 @@ function handle(ev){
             setScript(fs.readFileSync(path.join(__dirname, "../../pages/element-plus.js"), "utf-8"));
             setToolsBar();
             setToolsBarStyle();
+            // if ()
             break;
     }
 }
 
-addEventListener('load',handle)
+addEventListener('load',handle);
+
 function setToolsBarStyle(){
     setStyle(`
 #tools-bar{

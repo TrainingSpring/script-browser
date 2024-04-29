@@ -12,6 +12,7 @@ function createWindow(){
         },
         autoHideMenuBar:true
     })
+    win.maximize();
     // 页面加载
     // win.loadURL('http://sww.com.cn/');
     win.loadFile(path.join(__dirname,"src/pages/index.html"))
