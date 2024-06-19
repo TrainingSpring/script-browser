@@ -48,6 +48,7 @@ function setToolsBar(){
     </div>
     <div class="tools-bar-function-list">
         <div class="function-title">合并</div>
+        <el-input placeholder="标题" style="margin-bottom:10px;" v-model="mergeTitle"></el-input>
         <div class="button-group">
             <div class="btn-item" @click="merge('dev')" id="to-dev">开发</div>
             <div class="btn-item" @click="merge('test')" id="to-test">测试</div>
@@ -55,9 +56,10 @@ function setToolsBar(){
             <div class="btn-item" @click="merge('master')" id="to-pro">生产</div>
         </div>
         <div class="function-title">标签</div>
+        <el-input placeholder="Message" style="margin-bottom:10px;" v-model="tagMsg"></el-input>
         <div class="button-group">
-            <div class="btn-item" id="tag-pre">预发</div>
-            <div class="btn-item" id="tag-pro">生产</div>
+            <div class="btn-item" id="tag-pre" @click="tag('pre','pre')">预发</div>
+            <div class="btn-item" id="tag-pro" @click="tag('master','prod')">生产</div>
         </div>
     </div>
     
@@ -80,7 +82,11 @@ function setToolsBar(){
                 list:{
                     lab:[],
                     branch:[]
-                }
+                },
+                // tag的信息
+                tagMsg:"",
+                // 合并的标题
+                mergeTitle:""
             }
         },
         mounted() {
@@ -164,7 +170,6 @@ function setToolsBar(){
                         let li = dom.querySelectorAll(".content-list.mr-list>li");
                         for (let i = 0;i<li.length;i++){
                             let child = li[i];
-                            debugger;
                             let sb = child.querySelector(".merge-request-title.title .merge-request-title-text a").text;
                             let tb = child.querySelector(".project-ref-path.has-tooltip a.ref-name").text.trim();
                             if (sb == this.branch && tb == target_branch){
@@ -207,7 +212,7 @@ function setToolsBar(){
                         let authenticity_token = dom.querySelector("input[name='authenticity_token']").value;
                         let params = {
                             authenticity_token,
-                            "merge_request[title]": this.branch,
+                            "merge_request[title]": this.mergeTitle || this.branch,
                             "merge_request_diff_head_sha": dom.querySelector("#merge_request_diff_head_sha").value,
                             "merge_request[description]": "",
                             "merge_request[assignee_ids][]": dom.querySelector("input[name='merge_request[assignee_ids][]']").value,
@@ -266,6 +271,70 @@ function setToolsBar(){
                         }
                     },1000)
                 }
+            },
+            // 获取tag名
+            getTagName(alias){
+                let item = this.getItemById(this.list.lab,this.lab);
+                let date = new Date();
+                let tagName = `tag_`+alias+'_'+this.lab+'_'+date.getFullYear()+this.numberAddZero(date.getMonth()+1)+this.numberAddZero(date.getDate())+'_v'
+                // 通过遍历找可用tag名
+                let eachName = (callback)=>{
+                    for (let i = 1;i < 100 ;i ++){
+                        let tn = tagName+i;
+                        if(callback(tn))return tn;
+                    }
+                    return null;
+                }
+                return new Promise((resolve,reject) => {
+                    axios.get(item.relative_path+"/-/tags").then(res=>{
+                        let dom = new DOMParser().parseFromString(res.data,"text/html");
+                        let li = dom.querySelectorAll("#content-body .tags ul.content-list>li");
+                        let tn = eachName((tn)=>{
+                            for (let i = 0;i<li.length;i++){
+                                let child = li[i];
+                                let name = child.querySelector("a.item-title").innerText.trim();
+                                if (name === tn)return false;
+                            }
+                            return true;
+                        })
+                        resolve(tn);
+                    })
+                })
+            },
+            numberAddZero(num){
+                if(num < 10)return "0"+num;
+                else return num+"";
+            },
+            tag(target_branch,alias){
+                if (this.lab == null){
+                    this.$message.error("请选择仓库！");
+                    return;
+                }else if (this.branch == null) {
+                    this.$message.error("请选择分支！");
+                    return;
+                }
+                let item = this.getItemById(this.list.lab,this.lab);
+
+                this.getTagName(alias).then((res)=>{
+                    if (res == null) return  this.$message.error("[error] 获取tag name 出错!");
+                    axios.get(item.relative_path+"/-/tags/new").then(domData=>{
+                        let dom = new DOMParser().parseFromString(domData.data,"text/html");
+                        let authenticity_token = dom.querySelector("input[name='authenticity_token']").value;
+                        axios.post(item.relative_path+"/-/tags",{
+                            "tag_name":res,
+                            "tag_message":this.tagMsg,
+                            "ref":target_branch,
+                            authenticity_token
+                        }).then(res=>{
+                            this.$message.success("tag已创建！");
+                        }).catch(err=>{
+                            this.$message.error("[error] 创建tag出错!");
+                        })
+                    })
+                }).catch(err=>{
+                    console.error(err);
+                    this.$message.error("[error] 获取合并请求页面出错!")
+                })
             }
         }
     });

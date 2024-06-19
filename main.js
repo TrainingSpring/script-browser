@@ -10,7 +10,7 @@ function createWindow(){
             contextIsolation:false,
             preload:path.join(__dirname,"src/assets/js/index.js")
         },
-        autoHideMenuBar:true
+        autoHideMenuBar:true,
     })
     win.maximize();
     // 页面加载
